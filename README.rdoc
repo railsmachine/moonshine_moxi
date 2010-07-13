@@ -1,0 +1,13 @@
+= Moonshine Moxi
+
+=== A plugin for Moonshine[http://github.com/railsmachine/moonshine]
+
+A plugin for installing and managing moxi.
+
+=== Instructions
+
+* <tt>script/plugin install git://github.com/ACCOUNT/moonshine_moxi.git</tt>
+* Configure settings if needed
+    configure(:moxi => {:foo => true})
+* Invoke the recipe(s) in your Moonshine manifest
+    recipe :moxi
