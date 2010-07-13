@@ -1,0 +1,1 @@
+MOXI_OPTS="-z /etc/moxi.conf -d -u <%= options[:user] || 'nobody' %> -P /var/run/moxi.pid -m <%= options[:max_memory] || '64' %>"

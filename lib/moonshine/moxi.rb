@@ -32,18 +32,22 @@ module Moonshine
         :cwd => '/tmp',
         :require => package('wget'),
         :unless => "test -f /usr/local/bin/moxi"
+      
+      file '/etc/default/moxi', 
+        :content => template(moxi_template_dir.join('moxi.default')), binding),
+        :mode => '755',
+        :before => file('/etc/init.d/moxi')
+
+      file '/etc/init.d/moxi', 
+        :content => template(moxi_template_dir.join('moxi.init')), binding),
+        :mode => '755',
+        :before => file('/etc/moxi.conf')
         
       file '/etc/moxi.conf', 
         :content => template(moxi_template_dir.join('moxi.conf.erb')), binding),
         :mode => '644',
         :require => exec('install moxi'),
         :notify => service('moxi')
-          
-      file '/etc/init.d/moxi', 
-        :content => template(moxi_template_dir.join('moxi.init')), binding),
-        :mode => '755',
-        :require => exec('install moxi'),
-        :before => file('/etc/moxi.conf')
 
       service 'moxi', :ensure => :running, :require => file('/etc/init.d/moxi')
       
