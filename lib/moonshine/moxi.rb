@@ -2,7 +2,7 @@ module Moonshine
   module Moxi
     
     def moxi_template_dir
-      @moxi_template_dir ||= Pathname.new(__FILE__).dirname.dirname.join('templates')
+      @moxi_template_dir ||= Pathname.new(__FILE__).dirname.dirname.dirname.join('templates')
     end
     # Define options for this plugin via the <tt>configure</tt> method
     # in your application manifest:
@@ -23,7 +23,7 @@ module Moonshine
       exec 'install moxi',
         :command => [
           "wget http://labs.northscale.com/moxi/moxi-0.10.0.tar.gz",
-          "tar xzf http://labs.northscale.com/moxi/moxi-0.10.0.tar.gz",
+          "tar xzf moxi-0.10.0.tar.gz",
           "cd moxi-0.10.0",
           './configure',
           'make',
@@ -34,17 +34,17 @@ module Moonshine
         :unless => "test -f /usr/local/bin/moxi"
       
       file '/etc/default/moxi', 
-        :content => template(moxi_template_dir.join('moxi.default')), binding),
+        :content => template(moxi_template_dir.join('moxi.default'), binding),
         :mode => '755',
         :before => file('/etc/init.d/moxi')
 
       file '/etc/init.d/moxi', 
-        :content => template(moxi_template_dir.join('moxi.init')), binding),
+        :content => template(moxi_template_dir.join('moxi.init'), binding),
         :mode => '755',
         :before => file('/etc/moxi.conf')
         
       file '/etc/moxi.conf', 
-        :content => template(moxi_template_dir.join('moxi.conf.erb')), binding),
+        :content => template(moxi_template_dir.join('moxi.conf.erb'), binding),
         :mode => '644',
         :require => exec('install moxi'),
         :notify => service('moxi')
