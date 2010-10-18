@@ -15,24 +15,26 @@ module Moonshine
     #    recipe :moxi
     def moxi(options = {})
       %w(build-essential automake libtool pkg-config check libssl-dev sqlite3 libsqlite3-dev libevent-dev libglib2.0-dev libglib2.0-0-dbg).each do |p|
-        package p, :ensure => :installed, :before => exec('install moxi')
+        package p, :ensure => :installed, :before => package('moxi-server')
       end
       
       package 'wget', :ensure => :installed
-              
-      exec 'install moxi',
-        :command => [
-          "wget http://labs.northscale.com/moxi/moxi-0.10.0.tar.gz",
-          "tar xzf moxi-0.10.0.tar.gz",
-          "cd moxi-0.10.0",
-          './configure',
-          'make',
-          'make install'
-        ].join(' && '),
-        :cwd => '/tmp',
+
+      file '/usr/local/src', :ensure => :directory
+
+      exec 'download moxi',
+        :command => "wget http://c2493362.cdn.cloudfiles.rackspacecloud.com/moxi-server_x86_64_1.6.0.deb",
+        :cwd => '/usr/local/src',
         :require => package('wget'),
-        :unless => "test -f /usr/local/bin/moxi"
-      
+        :unless => "test -f /opt/moxi/bin/moxi"
+      package 'moxi-server',
+        :ensure   => :installed,
+        :provider => :dpkg,
+        :source   => '/usr/local/src/moxi-server_x86_64_1.6.0.deb',
+        :require  => exec('download moxi')
+
+      file '/usr/local/bin/moxi', :ensure => '/opt/moxi/bin/moxi', :require => package('moxi-server'), :notify => service('moxi')
+
       file '/etc/default/moxi', 
         :content => template(moxi_template_dir.join('moxi.default'), binding),
         :mode => '755',
@@ -46,10 +48,10 @@ module Moonshine
       file '/etc/moxi.conf', 
         :content => template(moxi_template_dir.join('moxi.conf.erb'), binding),
         :mode => '644',
-        :require => exec('install moxi'),
+        :require => package('moxi-server'),
         :notify => service('moxi')
 
-      service 'moxi', :ensure => :running, :require => file('/etc/init.d/moxi')
+      service 'moxi', :ensure => :running, :enable => true, :require => file('/etc/moxi.conf')
       
     end
   
