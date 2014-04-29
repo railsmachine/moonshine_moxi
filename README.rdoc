@@ -11,3 +11,6 @@ A plugin for installing and managing moxi.
     configure(:moxi => {:foo => true})
 * Invoke the recipe(s) in your Moonshine manifest
     recipe :moxi
+
+
+Unless otherwise specified, all content copyright (C) 2014, Rails Machine
